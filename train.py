@@ -194,11 +194,17 @@ def main() -> int:
     if device_type == "cuda":
         torch.backends.cuda.matmul.allow_tf32 = True
         torch.backends.cudnn.allow_tf32 = True
-        if torch.cuda.is_bf16_supported():
+        cc_major, cc_minor = torch.cuda.get_device_capability()
+        # torch.cuda.is_bf16_supported() defaults to including_emulation=True, which
+        # returns True on Turing (T4) even though bf16 has no tensor-core path there
+        # and is emulated through fp32. Measured cost of believing it: 7,860 tok/s on
+        # a T4, which is fp32 speed. Native bf16 needs SM 8.0+ (Ampere and later).
+        if cc_major >= 8:
             amp_dtype, use_scaler = torch.bfloat16, False
         else:
-            amp_dtype, use_scaler = torch.float16, True  # T4: Turing, no bf16
-        print(f"[device] {torch.cuda.get_device_name(0)} | {amp_dtype} | scaler={use_scaler}")
+            amp_dtype, use_scaler = torch.float16, True
+        print(f"[device] {torch.cuda.get_device_name(0)} | sm_{cc_major}{cc_minor} | "
+              f"{amp_dtype} | scaler={use_scaler}")
     else:
         amp_dtype, use_scaler = torch.float32, False
         threads = tcfg.get("cpu_threads") or os.cpu_count() or 1

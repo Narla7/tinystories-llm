@@ -17,7 +17,8 @@ import subprocess
 import sys
 
 CONFIG_NAME = "configs/tiny25m.json"
-MAX_STEPS = int(os.environ.get("MAX_STEPS", "0")) or None
+# Flip to a small number for a cheap speed/plumbing check, None for the real run.
+MAX_STEPS = 200
 
 
 def resolve_repo() -> str:

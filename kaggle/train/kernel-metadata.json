@@ -9,10 +9,10 @@
   "enable_tpu": false,
   "enable_internet": true,
   "keywords": [],
-  "dataset_sources": [
-    "vaibhavnarla/tinystories-tokens"
+  "dataset_sources": [],
+  "kernel_sources": [
+    "vaibhavnarla/tinystories-prep-data"
   ],
-  "kernel_sources": [],
   "competition_sources": [],
   "model_sources": []
 }
