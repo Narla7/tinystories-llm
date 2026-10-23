@@ -20,7 +20,7 @@ import subprocess
 import sys
 
 # Flip to a small number to validate the pipeline cheaply before the real run.
-MAX_STEPS = None
+MAX_STEPS = 60
 
 VOCAB_SIZE = 4096
 TOKENS_DIR = "/kaggle/working/tokens"
