@@ -12,8 +12,8 @@
     "bias": true
   },
   "train": {
-    "batch_size": 32,
-    "grad_accum": 4,
+    "batch_size": 64,
+    "grad_accum": 2,
     "target_tokens": 550000000,
     "warmup_frac": 0.02,
     "lr": 0.001,
