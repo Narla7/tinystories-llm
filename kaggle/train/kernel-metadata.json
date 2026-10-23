@@ -1,0 +1,18 @@
+{
+  "id": "narla/tinystories-train-25m",
+  "title": "tinystories train 25m",
+  "code_file": "train_kernel.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "keywords": [],
+  "dataset_sources": [
+    "narla/tinystories-tokens"
+  ],
+  "kernel_sources": [],
+  "competition_sources": [],
+  "model_sources": []
+}
