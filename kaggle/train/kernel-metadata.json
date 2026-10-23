@@ -1,5 +1,5 @@
 {
-  "id": "narla/tinystories-train-25m",
+  "id": "vaibhavnarla/tinystories-train-25m",
   "title": "tinystories train 25m",
   "code_file": "train_kernel.py",
   "language": "python",
@@ -10,7 +10,7 @@
   "enable_internet": true,
   "keywords": [],
   "dataset_sources": [
-    "narla/tinystories-tokens"
+    "vaibhavnarla/tinystories-tokens"
   ],
   "kernel_sources": [],
   "competition_sources": [],
