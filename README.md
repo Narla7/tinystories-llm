@@ -9,6 +9,27 @@ coherent, grammatical English, because the corpus is deliberately narrow instead
 of the whole web. Their 28M model beat GPT-2-XL on their own prompts. That's the
 bar.
 
+## Run it
+
+The weights are 55 MB and ship as a GGUF, so Ollama runs them natively. No
+Python, no torch, no GPU.
+
+```bash
+ollama serve                       # if it isn't already running
+python nemo.py --install           # downloads the GGUF, runs `ollama create nemo`
+python nemo.py                     # the TUI
+python nemo.py "Once upon a time"  # or one-shot, no UI
+ollama run nemo                    # or skip the harness entirely
+```
+
+The TUI is curses, standard library only: history scrolls, Enter sends, Ctrl+Q
+quits, and `/temp 0.9`, `/topk 40`, `/seed 7`, `/clear` adjust it live.
+
+What it is good at: two or three paragraphs of simple narrative with a thing that
+goes wrong and a gentle ending. What it is not: a chatbot. It was trained only on
+children's stories, so ask it about the weather and it will write you a story
+about the weather.
+
 ## The numbers
 
 | | |

@@ -7,3 +7,6 @@ runs/
 *.bin
 *.tmp
 out-train/
+export/nemo/
+export/nemo-f16.gguf
+out-tok/

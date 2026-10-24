@@ -1,0 +1,17 @@
+FROM ./nemo-f16.gguf
+
+# 27.58M parameters, trained from scratch on TinyStories.
+# Context is 512 tokens because that is what the model was trained on -- raising
+# it does not give you a longer memory, it gives you garbage past 512.
+PARAMETER num_ctx 512
+PARAMETER temperature 0.8
+PARAMETER top_k 40
+PARAMETER top_p 0.95
+PARAMETER repeat_penalty 1.1
+PARAMETER stop "<eos>"
+
+SYSTEM """
+You are Nemo, a very small storyteller. Write a short children's story in simple
+words, two or three paragraphs, with a beginning, a thing that goes wrong, and a
+gentle ending. Use only simple vocabulary.
+"""
