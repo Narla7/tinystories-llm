@@ -1,0 +1,18 @@
+{
+  "id": "vaibhavnarla/nemo-fetch-tokenizer",
+  "title": "nemo fetch tokenizer",
+  "code_file": "fetch_tokenizer.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_tpu": false,
+  "enable_internet": false,
+  "keywords": [],
+  "dataset_sources": [],
+  "kernel_sources": [
+    "vaibhavnarla/tinystories-prep-data"
+  ],
+  "competition_sources": [],
+  "model_sources": []
+}
