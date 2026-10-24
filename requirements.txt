@@ -1,4 +1,8 @@
+# To RUN the model (TUI, one-shot, everything in nemo.py):
+numpy>=1.24
+
+# To TRAIN from scratch or re-export on top of that:
 torch>=2.4
-numpy>=1.26
 tokenizers>=0.20
 datasets>=2.19
+safetensors>=0.4
