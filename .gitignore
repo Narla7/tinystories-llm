@@ -6,3 +6,4 @@ runs/
 *.pt
 *.bin
 *.tmp
+out-train/
