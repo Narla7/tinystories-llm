@@ -87,7 +87,7 @@ steps. It proves the tokenizer, the data loader, the loss, the atomic
 checkpoint, the resume path, and the sampler all work before you spend a single
 GPU-hour.
 
-## The real run (Kaggle, free, no card)
+## The real run 
 
 Two script kernels. `kaggle/kaggle.json` API token needed (Kaggle -> Settings ->
 Create New API Token).
