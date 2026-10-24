@@ -13,16 +13,41 @@ bar.
 
 | | |
 |---|---|
-| params | 27.6M (8 layers, d_model 512, 8 heads, block 512) |
+| params | 27.58M (8 layers, d_model 512, 8 heads, block 512) — measured, not estimated |
 | vocab | 4096, byte-level BPE trained on this corpus |
-| tokens | ~550M (TinyStories, one epoch) |
-| FLOPs | 8.9e16 |
-| on 1x T4 | ~1.2 h |
-| on 4 cores of a Haswell i5 | ~550 h — don't |
-| checkpoint size | 0.32 GB each (fp32 weights + Adam state) |
+| tokens | 548M in the corpus; the shipped run used 350M (0.64 epochs) |
+| measured throughput | 49,845 tok/s training-only on one T4 |
+| the run that exists | 5,341 steps, 122 min, val loss 1.2121 |
+| full epoch would be | ~3.1 h |
+| checkpoint size | ~0.33 GB each (fp32 weights + Adam state) |
 
-`configs/tiny25m.json` holds all of it. `configs/smoke.json` is a 60K-parameter
+`configs/tiny25m.json` holds all of it. `configs/smoke.json` is a 140K-parameter
 toy for testing the plumbing in under a minute.
+
+## Results
+
+TinyStories, 27.58M params, 350M tokens, 122 minutes on a free Kaggle T4.
+
+```
+[eval] step  250  train 2.5017  val 2.4946
+[eval] step  750  train 1.7197  val 1.7165
+[eval] step 2000  train 1.4099  val 1.4256
+[eval] step 3000  train 1.3132  val 1.3222
+[eval] step 4000  train 1.2414  val 1.2537
+[eval] step 5250  train 1.2102  val 1.2121
+```
+
+Val tracks train to within 0.01, so at 0.64 epochs this model is still
+undertrained, not overfitting. It writes:
+
+```
+Once upon a time, in a big forest, there was a little boy named Tim. Tim had a
+toy spear that he loved to play with. One day, he met a foolish squirrel named
+Sam. Sam always wanted to play with Tim's spear. Tim didn't want to share his
+spear, so he told Sam to go away. ... When they got to the ant hill, they found
+out that the spear wasn't a toy after all! It was a magic spear that could make
+wishes come true. Tim and Sam learned that sharing is important.
+```
 
 ## Quickstart (local, CPU, smoke test only)
 
