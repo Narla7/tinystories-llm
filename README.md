@@ -144,6 +144,27 @@ Resume is automatic — rerun the same command. `--fresh` starts over.
 If val loss turns up while train loss keeps falling, you are overfitting the
 550M tokens; stop, or add dropout.
 
+## Rebuilding the GGUF
+
+`export_hf.py` turns a checkpoint into an HF GPT-2 layout, then llama.cpp's
+`convert_hf_to_gguf.py` produces the GGUF:
+
+```bash
+python export_hf.py --ckpt out-train/runs/tiny25m/best.pt \
+                    --tokenizer out-tok/nemo-tokenizer/tokenizer.json \
+                    --out export/nemo
+python /path/to/llama.cpp/convert_hf_to_gguf.py export/nemo \
+       --outfile export/nemo-f16.gguf --outtype f16
+```
+
+One snag, because it will bite you: llama.cpp fingerprints the tokenizer by
+hashing the token ids of a fixed test string, so a BPE you trained yourself can
+never match a known family and the converter raises
+`BPE pre-tokenizer was not recognized`. Our pre-tokenizer *is* HuggingFace
+ByteLevel, which is the GPT-2 regex, so patch `conversion/base.py` to set
+`res = "gpt-2"` immediately after `res = None` in `get_vocab_base_pre()`. This
+only affects conversion; users of the released GGUF never touch it.
+
 ## Files
 
 ```
