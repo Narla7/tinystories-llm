@@ -10,3 +10,4 @@ out-train/
 export/nemo/
 export/nemo-f16.gguf
 out-tok/
+nemo-f16.gguf
