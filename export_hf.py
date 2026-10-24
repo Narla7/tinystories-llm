@@ -105,7 +105,7 @@ def main() -> int:
     with open(out / "merges.txt", "w", encoding="utf-8") as f:
         f.write("#version: 0.2\n")
         for m in merges:
-            f.write(f"{m}\n")
+            f.write(f"{' '.join(m) if isinstance(m, (list, tuple)) else m}\n")
 
     # Without this, transformers appends its default <|endoftext|> at id 4096 as an
     # added token, which pushes max(vocab) past vocab_size and makes llama.cpp's

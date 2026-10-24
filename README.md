@@ -11,24 +11,29 @@ bar.
 
 ## Run it
 
-The weights are 55 MB and ship as a GGUF, so Ollama runs them natively. No
-Python, no torch, no GPU.
+No server, no daemon, no GGUF, no llama.cpp. The repo ships its own inference
+engine — a GPT-2 forward pass in numpy — so the only dependency is numpy.
 
 ```bash
-ollama serve                       # if it isn't already running
-python nemo.py --install           # downloads the GGUF, runs `ollama create nemo`
-python nemo.py                     # the TUI
-python nemo.py "Once upon a time"  # or one-shot, no UI
-ollama run nemo                    # or skip the harness entirely
+pip install numpy
+python nemo.py                      # the TUI
+python nemo.py "Once upon a time"   # one-shot, no UI
 ```
 
-The TUI is curses, standard library only: history scrolls, Enter sends, Ctrl+Q
-quits, and `/temp 0.9`, `/topk 40`, `/seed 7`, `/clear` adjust it live.
+On first run it downloads `nemo_weights.npz` (55 MB) from the release. That file
+is the whole model: float16 weights, tied embeddings, nothing else.
+
+The TUI is curses, standard library only: transcript scrolls, Enter sends,
+Ctrl+Q quits, Ctrl+N rolls the seed, and `/temp 0.9`, `/topk 40`, `/seed 7`,
+`/len 300`, `/clear`, `/help` work live.
 
 What it is good at: two or three paragraphs of simple narrative with a thing that
 goes wrong and a gentle ending. What it is not: a chatbot. It was trained only on
 children's stories, so ask it about the weather and it will write you a story
 about the weather.
+
+Measured on a 2014 Haswell i5 with no GPU: 78–88 tok/s, and the forward pass is
+verified against the PyTorch reference to within 0.003 on the logits.
 
 ## The numbers
 
@@ -168,13 +173,18 @@ only affects conversion; users of the released GGUF never touch it.
 ## Files
 
 ```
-model.py            GPT: pre-LN, learned positions, GELU, tied embeddings
+nemo.py             the curses TUI (stdlib only, no deps)
+nemo_engine.py      GPT-2 forward pass + byte-level BPE, numpy only
+nemo_tokenizer.json vocab, merges, eos — ships with the repo
+nemo_weights.npz    the weights (downloaded from the release on first run)
+model.py            the same GPT in PyTorch, for training
 train.py            loop, cosine LR, fp16 autocast, atomic checkpoints, resume
 tokenize_data.py    parquet -> BPE -> flat uint16 bins
-sample.py           top-k sampling from a checkpoint
+sample.py           PyTorch sampler, for comparing against the numpy engine
+export_hf.py        checkpoint -> HF GPT-2 layout (for GGUF conversion)
+export_npz.py       checkpoint -> float16 npz (what the TUI actually reads)
 configs/            smoke.json, tiny25m.json
-kaggle/prep/        script kernel: build the corpus once
-kaggle/train/       script kernel: train
+kaggle/             prep, train, sample, fetch and combined kernels
 kaggle/push.sh      thin kaggle-CLI wrapper
 ```
 

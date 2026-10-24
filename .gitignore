@@ -12,3 +12,4 @@ export/nemo-f16.gguf
 out-tok/
 nemo-f16.gguf
 PROCEDURE.md
+nemo_weights.npz
