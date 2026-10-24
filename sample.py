@@ -68,6 +68,9 @@ def main() -> int:
     if args.seed is not None:
         torch.manual_seed(args.seed)
 
+    eos_id = tok.token_to_id("<eos>")
+    print(f"[tok] vocab {tok.get_vocab_size()} | eos_id {eos_id}")
+
     for i in range(args.num_samples):
         ids = tok.encode(args.prompt, add_special_tokens=False).ids
         idx = torch.tensor([ids], dtype=torch.long, device=device)
@@ -76,8 +79,9 @@ def main() -> int:
             max_new_tokens=args.max_new_tokens,
             temperature=args.temperature,
             top_k=args.top_k,
+            eos_id=eos_id,
         )
-        text = tok.decode(out[0].tolist())
+        text = tok.decode(out[0].tolist(), skip_special_tokens=True)
         if "<eos>" in text:
             text = text.split("<eos>")[0]
         print(f"\n--- sample {i+1} ---\n{text.strip()}")
