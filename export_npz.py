@@ -2,9 +2,9 @@
 """
 Pack the trained weights into a single .npz that numpy can load directly.
 
-No GGUF, no llama.cpp, no Ollama, no torch at runtime. The harness that ships
-with this model reads this file and does the forward pass itself, so the only
-thing a user installs is numpy.
+No GGUF, no C++ toolchain, no torch at runtime. The harness that ships with this
+model reads this file and does the forward pass itself, so the only thing a user
+installs is numpy.
 
     python export_npz.py --hf export/nemo --out nemo_weights.npz
 
