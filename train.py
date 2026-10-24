@@ -329,6 +329,7 @@ def main() -> int:
     tokens_seen = start_step * tokens_per_step
     running_loss = None
     steps_run = 0
+    train_seconds = 0.0
     step = start_step
 
     for step in range(start_step, max_steps):
@@ -340,6 +341,7 @@ def main() -> int:
             g["lr"] = cur_lr
 
         optimizer.zero_grad(set_to_none=True)
+        t_step = time.time()
         for _ in range(grad_accum):
             x, y = train_ds.batch(batch_size, device)
             with amp_ctx:
@@ -356,14 +358,16 @@ def main() -> int:
         scaler.update()
         tokens_seen += tokens_per_step
         steps_run += 1
+        train_seconds += time.time() - t_step
 
         now = time.time()
 
         # ---- bench output: measured tok/s and a recomputed finish time ----
         if now - last_log >= tcfg.get("log_seconds", 10) or step == start_step:
             elapsed = now - t0
-            done = step - start_step + 1
-            tok_s = (done * tokens_per_step) / max(elapsed, 1e-9)
+            # tok/s counts training only: eval and checkpoint time would otherwise
+            # silently deflate it and make the ETA a lie.
+            tok_s = (steps_run * tokens_per_step) / max(train_seconds, 1e-9)
             remaining = (max_steps - step - 1) * tokens_per_step / max(tok_s, 1e-9)
             print(
                 f"step {step+1:>6}/{max_steps} | loss {running_loss:7.4f} | lr {cur_lr:.2e} | "
@@ -392,7 +396,8 @@ def main() -> int:
     save("last")
     elapsed = time.time() - t0
     print(f"\n[done] step {step+1}/{max_steps} in {elapsed/60:.1f}m "
-          f"({fmt_n(tokens_seen)} tokens total, {steps_run*tokens_per_step/max(elapsed,1e-9):,.0f} tok/s)")
+          f"({fmt_n(tokens_seen)} tokens total, "
+          f"{steps_run*tokens_per_step/max(train_seconds,1e-9):,.0f} tok/s training-only)")
     print(f"[done] checkpoint: {os.path.join(run_dir, 'last.pt')}")
     if STOP["flag"]:
         print(f"[done] stopped early by {STOP['reason']}; rerun the same command to resume.")

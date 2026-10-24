@@ -18,7 +18,7 @@ import sys
 
 CONFIG_NAME = "configs/tiny25m.json"
 # Flip to a small number for a cheap speed/plumbing check, None for the real run.
-MAX_STEPS = 60
+MAX_STEPS = 100
 
 
 def resolve_repo() -> str:
