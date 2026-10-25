@@ -2,11 +2,7 @@
 Nemo's inference engine: a GPT-2 forward pass in numpy, plus the byte-level BPE
 that goes with it.
 
-No torch, no llama.cpp, no server. `import numpy` is the whole dependency list.
-
-The model is 27.58M parameters, so a forward pass is 55 MFLOP per token — small
-enough that a 2014 desktop CPU does it at a readable speed, provided the KV cache
-works, because without one you re-run the entire 512-token context for every
+The model is 27.58M parameters, so a forward pass is 55 MFLOP per token
 generated token and it collapses from ~100 tok/s to ~0.2.
 
 Shapes follow HF's GPT-2 exactly: projections are Conv1D (in, out), so a layer is
@@ -22,9 +18,7 @@ from functools import lru_cache
 
 import numpy as np
 
-# --------------------------------------------------------------------------- #
 # byte-level BPE
-# --------------------------------------------------------------------------- #
 
 def _bytes_to_unicode() -> dict[int, str]:
     bs = (list(range(ord("!"), ord("~") + 1))
@@ -43,9 +37,6 @@ def _bytes_to_unicode() -> dict[int, str]:
 BYTE_ENCODER = _bytes_to_unicode()
 BYTE_DECODER = {v: k for k, v in BYTE_ENCODER.items()}
 
-# GPT-2's pre-tokenizer, ASCII-flavoured. Python's re has no \p{L}, so letters and
-# digits are spelled out; for the text this model was trained on the split is
-# identical, which is checked against the real tokenizer in tests.
 _SPLIT = None
 
 
@@ -71,7 +62,6 @@ class BPETokenizer:
         self.id_to_token = {i: t for t, i in self.vocab.items()}
         self.eos_id: int = d.get("eos_id", 0)
         self.block_size: int = d.get("block_size", 512)
-        # tokenizers >=0.20 emits merges as ["a", "b"] pairs; older files use "a b"
         self._ranks = {}
         for i, m in enumerate(d["merges"]):
             pair = tuple(m) if isinstance(m, (list, tuple)) else tuple(m.split(" "))
@@ -115,9 +105,7 @@ class BPETokenizer:
         return raw.decode("utf-8", errors="replace")
 
 
-# --------------------------------------------------------------------------- #
 # forward pass
-# --------------------------------------------------------------------------- #
 
 def _erf(x: np.ndarray) -> np.ndarray:
     """Vectorised erf, Abramowitz & Stegun 7.1.26. Max error 1.5e-7.
@@ -162,7 +150,7 @@ class Nemo:
         self.lnfb = p["transformer.ln_f.bias"]
         self.reset()
 
-    # -- state ------------------------------------------------------------
+    # state
     def reset(self) -> None:
         self.pos = 0
         self.k = [np.zeros((self.n_head, 0, self.head_dim), np.float32) for _ in range(self.n_layer)]
@@ -174,7 +162,7 @@ class Nemo:
         var = x.var(-1, keepdims=True)
         return (x - mu) / np.sqrt(var + eps) * w + b
 
-    # -- one token --------------------------------------------------------
+    # one token
     def step(self, token_id: int) -> np.ndarray:
         if self.pos >= self.block:
             # KV cache is full: drop the oldest position and shift everything down.
@@ -209,7 +197,7 @@ class Nemo:
             logits = self.step(t)
         return logits
 
-    # -- sampling ---------------------------------------------------------
+    # sampling
     def generate(self, prompt: str, max_new: int = 300, temperature: float = 0.8,
                  top_k: int = 40, top_p: float = 0.95, seed: int = 0,
                  repeat_penalty: float = 1.1):
@@ -229,7 +217,7 @@ class Nemo:
         dec = codecs.getincrementaldecoder("utf-8")("replace")
         for _ in range(max_new):
             lg = logits.astype(np.float64).copy()
-            # kids' stories repeat themselves if you let them
+            # kids' stories repeat themselves
             for prev in set(out[-64:]):
                 lg[prev] /= repeat_penalty if lg[prev] > 0 else 1.0
             if temperature <= 1e-6:
