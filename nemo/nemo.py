@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
-Nemo — a 27.58M-parameter storyteller trained from scratch on TinyStories,
+Nemo is a 27.58M-parameter storyteller trained from scratch on TinyStories,
 with its own terminal UI and its own inference engine baked in.
 
-There is no server, no daemon, no GGUF, no llama.cpp. nemo_engine.py runs the
-forward pass in numpy and this file draws curses on top of it. The only thing to
-install is numpy.
+nemo_engine.py runs the forward pass in numpy and this file draws curses on
+top of it. The only thing to install is numpy.
 
     python nemo.py                      # the TUI
     python nemo.py "Once upon a time"   # one-shot, no UI
@@ -64,9 +63,7 @@ def load_engine():
     return eng
 
 
-# --------------------------------------------------------------------------- #
 # layout
-# --------------------------------------------------------------------------- #
 
 def wrap(text: str, width: int) -> list[str]:
     lines: list[str] = []
@@ -228,8 +225,7 @@ def slash(line: str, st) -> None:
         except ValueError:
             st["text"] += f"[bad value for {cmd}]\n\n"
 
-
-# --------------------------------------------------------------------------- #
+# main
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Nemo — a tiny storyteller, self-contained")
